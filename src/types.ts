@@ -5,6 +5,6 @@ export interface Action {
 
 export interface Bug {
   desc: string;
-  id: number;
+  id: string;
   isResolved: boolean;
 }

@@ -1,15 +1,13 @@
 import * as actions from '../actions/actionTypes';
 import {Action, Bug} from '../types';
 
-let nextId = 0;
-
 const bugsReducer = (state: Bug[] = [], action: Action) => {
   switch (action.type) {
     case actions.ADD_BUG:
       return [
         ...state,
         {
-          id: nextId++,
+          id: action.payload.id,
           desc: action.payload.desc,
           isResolved: false,
         },

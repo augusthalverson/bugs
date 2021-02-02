@@ -11,7 +11,7 @@ import bugsReducer from './src/reducers/bugs';
 import BugsList from './src/components/bugsList';
 import Nav from './src/components/nav';
 import AddBug from './src/components/addBug';
-import {addBug} from './src/actions/bugs';
+import {addBug, resolveBug} from './src/actions/bugs';
 import firestore from '@react-native-firebase/firestore';
 
 const App = () => {
@@ -23,7 +23,13 @@ const App = () => {
       .get()
       .then((results) => {
         results.docs.forEach((bug) => {
-          store.dispatch(addBug(bug.data().desc));
+          store.dispatch(addBug(bug.data().desc, bug.id));
+          console.log(bug.data());
+          if (bug.data().isResolved) {
+            console.log('true');
+            console.log(bug.id);
+            store.dispatch(resolveBug(bug.id));
+          }
         });
       });
   });
@@ -46,9 +52,11 @@ const App = () => {
 const styles = StyleSheet.create({
   outerContainer: {
     flex: 1,
+    backgroundColor: 'rgb(20,22,33)',
   },
   container: {
     flex: 1,
+    backgroundColor: 'rgb(30,33,48)',
   },
   bugsListView: {
     flex: 1,

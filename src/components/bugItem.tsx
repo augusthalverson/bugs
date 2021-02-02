@@ -4,19 +4,43 @@ import {Text, View, StyleSheet, Button} from 'react-native';
 import {useDispatch} from 'react-redux';
 import {resolveBug, deleteBug, unresolveBug} from '../actions/bugs';
 import {Bug} from '../types';
+import firestore from '@react-native-firebase/firestore';
 
 const BugItem = ({bug}: {bug: Bug}) => {
+  console.log(`bug id: ${bug.id}`);
+  console.log(typeof bug.id);
   const dispatch = useDispatch();
 
   const handleResolve = () => {
     if (!bug.isResolved) {
       dispatch(resolveBug(bug.id));
+      firestore()
+        .collection('bugs')
+        .doc(bug.id)
+        .update({isResolved: true})
+        .then((result) => {
+          console.log(result);
+        });
     } else {
       dispatch(unresolveBug(bug.id));
+      firestore()
+        .collection('bugs')
+        .doc(bug.id)
+        .update({isResolved: false})
+        .catch((err) => {
+          console.log(err);
+        });
     }
   };
   const handleDelete = () => {
     dispatch(deleteBug(bug.id));
+    firestore()
+      .collection('bugs')
+      .doc(bug.id)
+      .delete()
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
@@ -51,22 +75,24 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 2,
-    borderBottomColor: 'lightgray',
+    borderBottomColor: 'rgb(146,152,195)',
     borderBottomWidth: 1,
   },
   resolvedBugText: {
     color: 'lightgray',
     textDecorationLine: 'line-through',
     textDecorationStyle: 'solid',
-    textDecorationColor: 'gray',
+    textDecorationColor: 'white',
   },
 
   bugLabelBox: {
     paddingVertical: 10,
     paddingHorizontal: 10,
+    flex: 1,
   },
   bugLabel: {
     fontSize: 18,
+    color: 'rgb(219, 222, 247)',
   },
   buttonContainer: {
     flexDirection: 'row',
