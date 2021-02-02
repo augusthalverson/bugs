@@ -4,6 +4,7 @@ import {
   View,
   KeyboardAvoidingView,
   SafeAreaView,
+  StatusBar,
 } from 'react-native';
 import {Provider} from 'react-redux';
 import {createStore} from 'redux';
@@ -36,6 +37,7 @@ const App = () => {
 
   return (
     <SafeAreaView style={styles.outerContainer}>
+      <StatusBar barStyle="light-content" />
       <Provider store={store}>
         <KeyboardAvoidingView style={styles.container} behavior="padding">
           <Nav />
