@@ -25,10 +25,7 @@ const App = () => {
       .then((results) => {
         results.docs.forEach((bug) => {
           store.dispatch(addBug(bug.data().desc, bug.id));
-          console.log(bug.data());
           if (bug.data().isResolved) {
-            console.log('true');
-            console.log(bug.id);
             store.dispatch(resolveBug(bug.id));
           }
         });
