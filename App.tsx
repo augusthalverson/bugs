@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   View,
@@ -15,8 +15,24 @@ import AddBug from './src/components/addBug';
 import {addBug, resolveBug} from './src/actions/bugs';
 import firestore from '@react-native-firebase/firestore';
 
+function useProductionMode() {
+  const [isProductionMode, setIsProductionMode] = useState(false);
+
+  useEffect(() => {
+    firestore()
+      .collection('meta')
+      .doc('nsxfDU7WgC2xpOBhigKN')
+      .onSnapshot((snap) => {
+        setIsProductionMode(snap.data()?.isProductionMode);
+      });
+  });
+
+  return isProductionMode;
+}
+
 const App = () => {
   const store = createStore(bugsReducer);
+  const isProductionMode = useProductionMode();
 
   useEffect(() => {
     firestore()
@@ -37,7 +53,7 @@ const App = () => {
       <StatusBar barStyle="light-content" />
       <Provider store={store}>
         <KeyboardAvoidingView style={styles.container} behavior="padding">
-          <Nav />
+          <Nav isProductionMode={isProductionMode} />
           <View style={styles.bugsListView}>
             <BugsList />
           </View>
