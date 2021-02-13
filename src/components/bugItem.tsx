@@ -7,8 +7,6 @@ import {Bug} from '../types';
 import firestore from '@react-native-firebase/firestore';
 
 const BugItem = ({bug}: {bug: Bug}) => {
-  console.log(`bug id: ${bug.id}`);
-  console.log(typeof bug.id);
   const dispatch = useDispatch();
 
   const handleResolve = () => {
@@ -44,7 +42,7 @@ const BugItem = ({bug}: {bug: Bug}) => {
   };
 
   return (
-    <View style={[styles.bug]}>
+    <View style={styles.bug}>
       <View style={styles.bugLabelBox}>
         <Text
           style={[
@@ -79,7 +77,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   resolvedBugText: {
-    color: 'lightgray',
+    color: '#fff',
+    opacity: 0.25,
     textDecorationLine: 'line-through',
     textDecorationStyle: 'solid',
     textDecorationColor: 'white',

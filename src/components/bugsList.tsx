@@ -1,20 +1,28 @@
+import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import * as React from 'react';
-import {Text, View, StyleSheet, ScrollView} from 'react-native';
+import {FC} from 'react';
+import {Text, View, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
 import {useSelector} from 'react-redux';
 import {Bug} from '../types';
 import BugItem from './bugItem';
 
-const BugsList = () => {
+const BugsList: FC<{navigation: NavigationProp<ParamListBase>}> = ({
+  navigation,
+}) => {
   const bugs = useSelector((state) => state) as Bug[];
 
   return (
     <View style={styles.container}>
       {bugs.length > 0 && (
-        <ScrollView>
-          {bugs.map((bug: Bug) => (
-            <BugItem key={bug.id} bug={bug} />
-          ))}
-        </ScrollView>
+        <FlatList
+          data={bugs}
+          renderItem={({item}) => (
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Details', {id: item.id})}>
+              <BugItem bug={item} />
+            </TouchableOpacity>
+          )}
+        />
       )}
 
       {bugs.length === 0 && (
