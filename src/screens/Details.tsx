@@ -1,6 +1,6 @@
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import * as React from 'react';
-import {FC} from 'react';
+import {FC, useEffect, useState} from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -8,53 +8,78 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {useDispatch} from 'react-redux';
+import {SafeAreaView, withSafeAreaInsets} from 'react-native-safe-area-context';
+import {useDispatch, useSelector} from 'react-redux';
 import {deleteBug, resolveBug, unresolveBug} from '../actions/bugs';
+import {Bug} from '../types';
 
 const Details: FC<{navigation: NavigationProp<ParamListBase>; route: any}> = ({
   navigation,
   route,
 }) => {
+  const bugs = useSelector((state) => state as Bug[]);
   const dispatch = useDispatch();
+  const [bug, setBug] = useState<Bug>();
+
+  useEffect(() => {
+    setBug(bugs.find((aBug: Bug) => aBug.id === route.params?.id));
+  }, [route.params, bugs]);
 
   const handleResolve = () => {
-    if (route.params?.isResolved) {
-      dispatch(unresolveBug(route.params?.id));
-    } else {
-      dispatch(resolveBug(route.params?.id));
+    if (bug) {
+      if (bug.isResolved) {
+        dispatch(unresolveBug(bug.id));
+      } else {
+        dispatch(resolveBug(bug.id));
+      }
     }
   };
 
   const handleDelete = () => {
-    dispatch(deleteBug(route.params?.id));
-    navigation.goBack();
+    if (bug) {
+      dispatch(deleteBug(bug.id));
+      navigation.goBack();
+    }
   };
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.innerContainer}>
-        <ScrollView>
-          <Text style={styles.idText}>{route.params?.id}</Text>
-          <Text style={styles.text}>{route.params?.desc}</Text>
-        </ScrollView>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[styles.button, styles.resolveButton]}
-            onPress={handleResolve}>
-            <Text style={styles.buttonText}>
-              {route.params?.isResolved ? 'Unresolve' : 'Resolve'}
+  if (bug) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.innerContainer}>
+          <ScrollView>
+            <Text style={styles.idText}>{bug.id}</Text>
+            <Text style={styles.text}>{bug.desc}</Text>
+            <Text
+              style={[
+                styles.isResolvedText,
+                bug.isResolved
+                  ? styles.isCompleteText
+                  : styles.isNotCompleteText,
+              ]}>
+              {bug.isResolved ? '✓ Completed' : 'Not completed'}
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, styles.deleteButton]}
-            onPress={handleDelete}>
-            <Text style={styles.buttonText}>Delete</Text>
-          </TouchableOpacity>
+          </ScrollView>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={[
+                styles.button,
+                bug.isResolved ? styles.unResolveButton : styles.resolveButton,
+              ]}
+              onPress={handleResolve}>
+              <Text style={styles.buttonText}>
+                {bug?.isResolved ? 'Unresolve' : 'Resolve'}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.button, styles.deleteButton]}
+              onPress={handleDelete}>
+              <Text style={styles.buttonText}>Delete</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    </SafeAreaView>
-  );
+      </SafeAreaView>
+    );
+  }
+  return <Text>Loading...</Text>;
 };
 
 export default Details;
@@ -92,9 +117,27 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     marginBottom: 10,
   },
+  isCompleteText: {
+    color: 'rgb(0,255,0)',
+  },
+  isNotCompleteText: {
+    color: 'rgb(255,0,0)',
+  },
+  isResolvedText: {
+    color: 'white',
+    textTransform: 'uppercase',
+    fontWeight: 'bold',
+    marginTop: 10,
+    opacity: 0.5,
+  },
   resolveButton: {
     backgroundColor: 'green',
     marginRight: 5,
+  },
+  unResolveButton: {
+    marginRight: 5,
+    borderColor: 'white',
+    borderWidth: 1,
   },
   text: {
     color: '#fff',

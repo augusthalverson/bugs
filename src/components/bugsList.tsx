@@ -1,11 +1,12 @@
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import * as React from 'react';
+import {FC} from 'react';
 import {Text, View, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
 import {useSelector} from 'react-redux';
 import {Bug} from '../types';
 import BugItem from './bugItem';
 
-const BugsList: React.FC<{navigation: NavigationProp<ParamListBase>}> = ({
+const BugsList: FC<{navigation: NavigationProp<ParamListBase>}> = ({
   navigation,
 }) => {
   const bugs = useSelector((state) => state) as Bug[];
@@ -17,7 +18,7 @@ const BugsList: React.FC<{navigation: NavigationProp<ParamListBase>}> = ({
           data={bugs}
           renderItem={({item}) => (
             <TouchableOpacity
-              onPress={() => navigation.navigate('Details', item)}>
+              onPress={() => navigation.navigate('Details', {id: item.id})}>
               <BugItem bug={item} />
             </TouchableOpacity>
           )}
